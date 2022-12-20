@@ -1,7 +1,11 @@
 package com.jwt.entity;
 
+import java.util.Set;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.ManyToMany;
 
 @Entity
 public class Role {
@@ -10,7 +14,17 @@ public class Role {
 	private String roleName;
 	private String roleDescription;
 	
+	@ManyToMany(mappedBy = "roles",cascade = {CascadeType.ALL})
+	private Set<User> users;
 	
+	
+	
+	public Set<User> getUsers() {
+		return users;
+	}
+	public void setUsers(Set<User> users) {
+		this.users = users;
+	}
 	public String getRoleName() {
 		return roleName;
 	}
@@ -23,6 +37,8 @@ public class Role {
 	public void setRoleDescription(String roleDescription) {
 		this.roleDescription = roleDescription;
 	}
+	
+	
 	
 	
 	
