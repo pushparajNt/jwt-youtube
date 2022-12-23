@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.jwt.Repository.RoleRepository;
@@ -18,7 +19,11 @@ public class UserServiceImpl implements UserService{
 	private UserRepository userRepository;
 	
 	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
 	private RoleRepository roleRepository;
+	
 	@Override
 	public User createNewUser(User user) {
 	
@@ -41,7 +46,7 @@ public class UserServiceImpl implements UserService{
 		adminUser.setUserName("admin@123");
 		adminUser.setUserFirstName("admin");
 		adminUser.setLastName("admin");
-		adminUser.setUserPassword("admin@passs");		
+		adminUser.setUserPassword(getEncodedPassword("admin@passs") );		
 		Set<Role> rolSet=new HashSet<>();
 		rolSet.add(adminRole);
 		adminUser.setRoles(rolSet);		
@@ -51,11 +56,15 @@ public class UserServiceImpl implements UserService{
 		normalUser.setUserName("pushparaj123");
 		normalUser.setUserFirstName("Pushparaj");
 		normalUser.setLastName("Narasimman");
-		normalUser.setUserPassword("user@passs");		
+		normalUser.setUserPassword(getEncodedPassword("user@passs"));		
 		Set<Role> normalRoleSet=new HashSet<>();
 		normalRoleSet.add(userRole);
 		normalUser.setRoles(normalRoleSet);		
 		userRepository.save(normalUser);
 	}
 
+	public String getEncodedPassword(String password)
+	{
+		return passwordEncoder.encode(password);
+	}
 }

@@ -3,8 +3,10 @@ package com.jwt.configuration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -22,17 +24,27 @@ import com.jwt.service.JwtService;
 @EnableWebSecurity
 public class WebSecurityConfig  {
 	
+	@Lazy
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
 	
 	@Autowired
 	private UserDetailsService jwtService;
-	  AuthenticationManager authenticationManager;
+	
+	@Lazy
+	@Autowired 
+	AuthenticationManager authenticationManager;
+	
+	
+	 @Bean
+	    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+	        return authConfig.getAuthenticationManager();
+	    }
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception
 	{
-		  http.csrf().disable().cors().disable().authorizeHttpRequests().requestMatchers("").permitAll()
+		  http.csrf().disable().cors().disable().authorizeHttpRequests().requestMatchers("/authenticate","/registerNewUser").permitAll()
           .anyRequest().authenticated()
           .and()
           .authenticationManager(authenticationManager)
@@ -51,7 +63,8 @@ public class WebSecurityConfig  {
 	}
 	
 	@Autowired
-	public void confiureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception
+	@Lazy
+	public void configureGlobal(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception
 	{
 		authenticationManagerBuilder.userDetailsService(jwtService).passwordEncoder(passwordEncoder());
 	}
